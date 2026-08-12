@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Result - Suara Demokrasi Murid 2026</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           DESIGN SYSTEM (DARK BROADCAST MODE - HIGH TECH GRAPH)
+           ========================================================================== */
+        :root {
+            --bg-dark: #020617;
+            --card-dark: rgba(15, 23, 42, 0.85);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --text-light: #F8FAFC;
+            --text-dim: #94A3B8;
+            
+            /* WARNA KHUSUS MASING-MASING PASLON */
+            --color-paslon1: #10B981; /* HIJAU */
+            --color-paslon2: #EF4444; /* MERAH */
+            --color-paslon3: #EC4899; /* PINK */
+            --color-paslon4: #3B82F6; /* BIRU TERANG */
+
+            --font-serif: 'Playfair Display', serif;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            /* Base gradients ditambah dengan efek shape interaktif di HTML */
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+            color: var(--text-light);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            padding: 2rem 1.5rem 1rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* BACKGROUND GRID PATTERN */
+        #bg-pattern {
+            position: fixed;
+            inset: -5%;
+            width: 110%;
+            height: 110%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            pointer-events: none;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* RANDOM GLOWING GOLD SHAPES (BARU) */
+        .glowing-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+            animation: floatGlowLive 12s infinite alternate ease-in-out;
+        }
+
+        .shape-1 {
+            width: 600px;
+            height: 600px;
+            top: -15%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.18) 0%, transparent 70%);
+        }
+
+        .shape-2 {
+            width: 800px;
+            height: 800px;
+            bottom: -25%;
+            right: -15%;
+            background: radial-gradient(circle, rgba(255, 184, 0, 0.15) 0%, transparent 70%);
+            animation-delay: -4s;
+            animation-duration: 15s;
+        }
+
+        .shape-3 {
+            width: 500px;
+            height: 500px;
+            top: 30%;
+            left: 35%;
+            background: radial-gradient(circle, rgba(255, 200, 0, 0.08) 0%, transparent 70%);
+            animation-delay: -8s;
+            animation-duration: 18s;
+        }
+
+        @keyframes floatGlowLive {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+            100% { transform: translate(40px, -30px) scale(1.15); opacity: 1; }
+        }
+
+        .container {
+            max-width: 1380px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* BROADCAST HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title-box h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 900;
+            color: #FFFFFF;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .header-title-box .subtitle {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #60A5FA;
+            margin-top: 0.2rem;
+        }
+
+        .header-title-box .periode {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #94A3B8;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 0.2rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 0.4rem;
+        }
+
+        .live-status-box {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.15rem;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 99px;
+            color: #EF4444;
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            background-color: #EF4444;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #EF4444;
+            animation: blink 1.2s infinite;
+        }
+
+        .total-box {
+            background: rgba(30, 41, 59, 0.75);
+            border: 1px solid var(--card-border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 18px;
+            backdrop-filter: blur(12px);
+            text-align: right;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .total-box label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: block;
+        }
+
+        .total-box span {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 900;
+            color: #FFFFFF;
+        }
+
+        /* GRAPH DIAGRAM AREA */
+        .diagram-wrapper {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 2.5rem 2rem 1.5rem 2rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        /* GRID BACKGROUND LINES ON GRAPH */
+        .graph-lines {
+            position: absolute;
+            inset: 2.5rem 2rem 5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .graph-line {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .graph-line::after {
+            content: attr(data-val);
+            position: absolute;
+            right: 0;
+            top: -10px;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 700;
+        }
+
+        .bars-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            height: 380px;
+            align-items: flex-end;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bar-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        /* PERCENTAGE & VOTE DISPLAY ABOVE BAR */
+        .bar-value-badge {
+            margin-bottom: 0.75rem;
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+
+        .bar-percent {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .bar-count {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            margin-top: 0.25rem;
+        }
+
+        /* THE ANIMATED VERTICAL BAR */
+        .bar-track {
+            width: 100%;
+            max-width: 110px;
+            height: 100%;
+            max-height: 280px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 20px 20px 8px 8px;
+            display: flex;
+            align-items: flex-end;
+            padding: 6px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .bar-fill {
+            width: 100%;
+            height: 0%; /* Dynamic height calculated via JS */
+            border-radius: 14px 14px 6px 6px;
+            transition: height 1s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            box-shadow: 0 -5px 20px rgba(255,255,255,0.2);
+        }
+
+        /* WARNA MASING-MASING BATANG DIAGRAM */
+        #bar-fill-paslon1 { background: linear-gradient(180deg, #34D399 0%, var(--color-paslon1) 100%); }
+        #bar-fill-paslon2 { background: linear-gradient(180deg, #F87171 0%, var(--color-paslon2) 100%); }
+        #bar-fill-paslon3 { background: linear-gradient(180deg, #F472B6 0%, var(--color-paslon3) 100%); }
+        #bar-fill-paslon4 { background: linear-gradient(180deg, #60A5FA 0%, var(--color-paslon4) 100%); }
+
+        #percent-paslon1 { color: var(--color-paslon1); }
+        #percent-paslon2 { color: var(--color-paslon2); }
+        #percent-paslon3 { color: var(--color-paslon3); }
+        #percent-paslon4 { color: var(--color-paslon4); }
+
+        /* PASLON FOOTER INFO BELOW BAR */
+        .bar-footer-info {
+            margin-top: 1.25rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .paslon-num-tag {
+            display: inline-block;
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            font-weight: 900;
+            padding: 0.3rem 0.85rem;
+            border-radius: 8px;
+            color: #FFFFFF;
+            margin-bottom: 0.4rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .tag-p1 { background: var(--color-paslon1); }
+        .tag-p2 { background: var(--color-paslon2); }
+        .tag-p3 { background: var(--color-paslon3); }
+        .tag-p4 { background: var(--color-paslon4); }
+
+        .paslon-name {
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #F8FAFC;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .paslon-class {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        /* EFEK PEMIMPIN SUARA (LEADER GLOW) */
+        .bar-column.is-leader .bar-track {
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .bar-column.is-leader::before {
+            content: '👑 UNGGUL';
+            position: absolute;
+            top: -28px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000000;
+            font-family: var(--font-heading);
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+            z-index: 2;
+        }
+
+        /* OFFICIAL CENTERED FOOTER (TANPA TOMBOL PEMENANG) */
+        footer.official-live-footer {
+            text-align: center;
+            padding: 1rem 0;
+            border-top: 1px solid var(--card-border);
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .official-footer-text {
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            color: #94A3B8;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .official-footer-text span {
+            color: #F1F5F9;
+            font-weight: 800;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* MEDIA QUERIES RESPONSIVE */
+        @media (max-width: 850px) {
+            .bars-grid { gap: 1rem; }
+            .paslon-name { font-size: 0.9rem; }
+            .bar-percent { font-size: 1.4rem; }
+            header { flex-direction: column; align-items: flex-start; }
+            .live-status-box { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BACKGROUND GRID PATTERN & GLOWING SHAPES -->
+    <div id="bg-pattern"></div>
+    <div class="glowing-shape shape-1"></div>
+    <div class="glowing-shape shape-2"></div>
+    <div class="glowing-shape shape-3"></div>
+
+    <div class="container">
+        
+        <!-- HEADER -->
+        <header>
+            <div class="header-title-box">
+                <h1>Suara Demokrasi Murid</h1>
+                <div class="subtitle">SMKS Karya Guna Bhakti 1 Kota Bekasi</div>
+                <div class="periode">Periode 2026/2027</div>
+            </div>
+
+            <div class="live-status-box">
+                <div class="live-badge">
+                    <span class="live-dot"></span>
+                    LIVE REAL-TIME
+                </div>
+
+                <div class="total-box">
+                    <label>TOTAL SUARA MASUK</label>
+                    <span id="total-votes-display">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- AREA DIAGRAM / BAR GRAPH -->
+        <div class="diagram-wrapper">
+            
+            <!-- GRAPH LINES BACKGROUND -->
+            <div class="graph-lines">
+                <div class="graph-line" data-val="100%"></div>
+                <div class="graph-line" data-val="75%"></div>
+                <div class="graph-line" data-val="50%"></div>
+                <div class="graph-line" data-val="25%"></div>
+                <div class="graph-line" data-val="0%"></div>
+            </div>
+
+            <div class="bars-grid">
+                
+                <!-- PASLON 01 (HIJAU) -->
+                <div class="bar-column" id="col-paslon1">
+                    <div class="bar-value-badge">
+                        <div class="bar-percent" id="percent-paslon1">0%</div>
+                        <div class="bar-count"><span id="count-paslon1">0</span> Suara</div>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-fill-paslon1"></div>
+                    </div>
+                    <div class="bar-footer-info">
+                        <div class="paslon-num-tag tag-p1">01</div>
+                        <div class="paslon-name">Muhammad Helmi Hadad</div>
+                        <div class="paslon-class">XI TSM 2</div>
+                    </div>
+                </div>
+
+                <!-- PASLON 02 (MERAH) -->
+                <div class="bar-column" id="col-paslon2">
+                    <div class="bar-value-badge">
+                        <div class="bar-percent" id="percent-paslon2">0%</div>
+                        <div class="bar-count"><span id="count-paslon2">0</span> Suara</div>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-fill-paslon2"></div>
+                    </div>
+                    <div class="bar-footer-info">
+                        <div class="paslon-num-tag tag-p2">02</div>
+                        <div class="paslon-name">Adito Nugroho</div>
+                        <div class="paslon-class">XI TEI 2</div>
+                    </div>
+                </div>
+
+                <!-- PASLON 03 (PINK) -->
+                <div class="bar-column" id="col-paslon3">
+                    <div class="bar-value-badge">
+                        <div class="bar-percent" id="percent-paslon3">0%</div>
+                        <div class="bar-count"><span id="count-paslon3">0</span> Suara</div>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-fill-paslon3"></div>
+                    </div>
+                    <div class="bar-footer-info">
+                        <div class="paslon-num-tag tag-p3">03</div>
+                        <div class="paslon-name">Dinda Ratri Kusuma</div>
+                        <div class="paslon-class">XI DKV 2</div>
+                    </div>
+                </div>
+
+                <!-- PASLON 04 (BIRU TERANG) -->
+                <div class="bar-column" id="col-paslon4">
+                    <div class="bar-value-badge">
+                        <div class="bar-percent" id="percent-paslon4">0%</div>
+                        <div class="bar-count"><span id="count-paslon4">0</span> Suara</div>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-fill-paslon4"></div>
+                    </div>
+                    <div class="bar-footer-info">
+                        <div class="paslon-num-tag tag-p4">04</div>
+                        <div class="paslon-name">Muhammad Azzam</div>
+                        <div class="paslon-class">XI TKR 3</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- CENTERED OFFICIAL FOOTER -->
+        <footer class="official-live-footer">
+            <p class="official-footer-text">
+                Created BY OSIS 24  • <span>Sistem E-Voting Resmi TPS</span>
+            </p>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT REAL-TIME POLLING DARI GOOGLE APPS SCRIPT -->
+    <script>
+        // =====================================================================
+        // TEMPEL LINK APPS SCRIPT YANG SAMA DENGAN FILE INDEX.HTML DI SINI!
+        // =====================================================================
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvbzEUMsA946ga3zCsIyv5g57OwL-cKSDhoqGXzzQMnz_Ad5mddbGmHyPg7rIMjLu5rg/exec";
+
+        // FUNGSI MEMANGGIL DATA LIVE DARI GOOGLE SHEETS (ANTI-BUG / ANTI-CACHE)
+        function fetchLiveVotes() {
+            if (!SCRIPT_URL || SCRIPT_URL === "PASTE_LINK_APPS_SCRIPT_DISINI") {
+                console.warn("Harap masukkan SCRIPT_URL terlebih dahulu!");
+                return Promise.resolve();
+            }
+
+            // KUNCI PERBAIKAN: Penambahan &t=${new Date().getTime()} di akhir URL
+            return fetch(`${SCRIPT_URL}?action=get&t=${new Date().getTime()}`)
+                .then(response => response.json())
+                .then(data => {
+                    const v1 = Number(data.paslon1) || 0;
+                    const v2 = Number(data.paslon2) || 0;
+                    const v3 = Number(data.paslon3) || 0;
+                    const v4 = Number(data.paslon4) || 0;
+                    
+                    const totalVotes = v1 + v2 + v3 + v4;
+
+                    // Update Angka Total Suara Masuk
+                    document.getElementById('total-votes-display').innerText = totalVotes;
+
+                    // Update Tinggi Diagram & Persentase Masing-Masing Paslon
+                    updateBarUI('paslon1', v1, totalVotes);
+                    updateBarUI('paslon2', v2, totalVotes);
+                    updateBarUI('paslon3', v3, totalVotes);
+                    updateBarUI('paslon4', v4, totalVotes);
+
+                    // Beri Mahkota & Efek Glow pada Paslon Suara Terbanyak
+                    highlightLeader({ paslon1: v1, paslon2: v2, paslon3: v3, paslon4: v4 });
+                })
+                .catch(err => console.error("Gagal memperbarui data live:", err));
+        }
+
+        // FUNGSI MENGHITUNG DYNAMIC HEIGHT & PERSENTASE
+        function updateBarUI(key, count, total) {
+            const percent = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+            
+            document.getElementById(`count-${key}`).innerText = count;
+            document.getElementById(`percent-${key}`).innerText = percent + '%';
+            
+            // Animasi tinggi batang diagram secara halus
+            const displayHeight = percent > 0 ? percent : 2;
+            document.getElementById(`bar-fill-${key}`).style.height = displayHeight + '%';
+        }
+
+        // FUNGSI MENENTUKAN LEADER (PEMIMPIN SUARA SEMENTARA)
+        function highlightLeader(votesObj) {
+            let maxVotes = -1;
+            let leaderKey = null;
+
+            for (const [key, val] of Object.entries(votesObj)) {
+                document.getElementById(`col-${key}`).classList.remove('is-leader');
+                
+                if (val > maxVotes && val > 0) {
+                    maxVotes = val;
+                    leaderKey = key;
+                }
+            }
+
+            if (leaderKey) {
+                document.getElementById(`col-${leaderKey}`).classList.add('is-leader');
+            }
+        }
+
+        // EFEK PARALLAX INTERAKTIF PADA BACKGROUND
+        document.addEventListener("mousemove", (e) => {
+            const bg = document.getElementById("bg-pattern");
+            if(bg) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 30; 
+                const y = (e.clientY / window.innerHeight - 0.5) * 30;
+                bg.style.transform = `translate(${x}px, ${y}px)`;
+            }
+        });
+
+        // SISTEM POLLING CEPAT (Langsung minta data baru 0.8 detik setelah data sebelumnya selesai dimuat)
+        function startLivePolling() {
+            fetchLiveVotes().then(() => {
+                setTimeout(startLivePolling, 800);
+            });
+        }
+
+        // Jalankan polling otomatis
+        startLivePolling();
+    </script>

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Voting OSIS 25 - SMKS Karya Guna Bhakti 1 Kota Bekasi</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           DESIGN SYSTEM
+           ========================================================================== */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #020617 0%, #0F172A 50%, #172554 100%);
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(255, 255, 255, 0.95);
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --accent-purple: #7C3AED;
+            --accent-blue: #2563EB;
+            --accent-green: #059669;
+            --font-serif: 'Playfair Display', serif;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --transition-snappy: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+            overflow-x: hidden;
+        }
+
+        /* BACKGROUND PATTERN & GLOW SHAPES */
+        #bg-pattern {
+            position: fixed;
+            inset: -5%;
+            width: 110%;
+            height: 110%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+            animation: backgroundMove 20s linear infinite;
+            transition: transform 0.1s ease-out;
+        }
+
+        @keyframes backgroundMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        .glowing-shape {
+            position: fixed; /* FIXED agar tidak menambah tinggi scroll */
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+            animation: floatGlow 10s infinite alternate ease-in-out;
+        }
+
+        .shape-1 {
+            width: 500px;
+            height: 500px;
+            top: -10%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, transparent 70%);
+        }
+
+        .shape-2 {
+            width: 600px;
+            height: 600px;
+            bottom: -20%;
+            right: -10%;
+            background: radial-gradient(circle, rgba(255, 184, 0, 0.2) 0%, transparent 70%);
+            animation-delay: -3s;
+            animation-duration: 12s;
+        }
+
+        .shape-3 {
+            width: 400px;
+            height: 400px;
+            top: 30%;
+            left: 40%;
+            background: radial-gradient(circle, rgba(255, 200, 0, 0.15) 0%, transparent 70%);
+            animation-delay: -7s;
+            animation-duration: 15s;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+            100% { transform: translate(30px, 20px) scale(1.15); opacity: 1; }
+        }
+
+        /* SCREEN BLOCKED (DEVICES NON-TPS) */
+        #tps-blocked-screen {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #0F172A;
+            color: #F8FAFC;
+            z-index: 99999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .blocked-card {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            max-width: 480px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .blocked-card h1 {
+            font-family: var(--font-heading);
+            color: #EF4444;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        /* MAIN APP WRAPPER */
+        #main-app {
+            width: 100%;
+            max-width: 1380px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            padding: 0 0.5rem;
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1.25rem;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 99px;
+            color: var(--accent-purple);
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .hero-title-row {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+
+        h1.title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.2rem, 3.1vw, 2.6rem);
+            font-weight: 900;
+            line-height: 1.15;
+            color: #FFFFFF;
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+            max-width: 72%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .gradient-text {
+            font-family: var(--font-heading);
+            background: linear-gradient(to bottom, #FFE81C 0%, #FFB800 50%, #FF2A00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 0px 15px rgba(255, 215, 0, 0.4), 0px 4px 20px rgba(255, 42, 0, 0.3);
+        }
+
+        .subtitle-school {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #F8FAFC;
+            margin-bottom: 0.35rem;
+            letter-spacing: -0.01em;
+        }
+
+        .subtitle-periode {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #E2E8F0;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        /* FLOATING PILLS */
+        .floating-pill {
+            position: absolute;
+            top: 50%;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border);
+            padding: 0.6rem 1.1rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 3;
+            white-space: nowrap;
+        }
+
+        .floating-pill-left {
+            left: 0;
+            color: var(--accent-blue);
+            animation: floatLeftCenter 4s ease-in-out infinite alternate;
+        }
+
+        .floating-pill-right {
+            right: 0;
+            color: var(--accent-green);
+            animation: floatRightCenter 4.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatLeftCenter {
+            0% { transform: translateY(-50%) translateY(0px) rotate(-2deg); }
+            100% { transform: translateY(-50%) translateY(-10px) rotate(1deg); }
+        }
+
+        @keyframes floatRightCenter {
+            0% { transform: translateY(-50%) translateY(0px) rotate(2deg); }
+            100% { transform: translateY(-50%) translateY(-12px) rotate(-1deg); }
+        }
+
+        /* GRID 4 KANDIDAT (1 BARIS DI DESKTOP) */
+        .paslon-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) and (max-width: 1023px) {
+            .paslon-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .paslon-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .paslon-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 1.2rem;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+            transition: var(--transition-snappy);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paslon-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 22px 45px rgba(37, 99, 235, 0.22);
+            border-color: #60A5FA;
+        }
+
+        .paslon-img-wrapper {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            background: #CBD5E1;
+            position: relative;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+        }
+
+        .paslon-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            transition: var(--transition-snappy);
+        }
+
+        .paslon-card:hover .paslon-img-wrapper img {
+            transform: scale(1.04);
+        }
+
+        .paslon-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(15, 23, 42, 0.88);
+            color: #FFFFFF;
+            backdrop-filter: blur(8px);
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 99px;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .paslon-info h2 {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 0.2rem;
+        }
+
+        .paslon-info p {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 1.15rem;
+        }
+
+        .btn-coblos {
+            width: 100%;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #1D4ED8 100%);
+            color: #FFFFFF;
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: var(--transition-snappy);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-coblos:hover {
+            background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        /* FOOTER & BUTTON LIVE RESULT */
+        .live-footer {
+            text-align: center;
+        }
+
+        .btn-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 2rem;
+            background: rgba(15, 23, 42, 0.92);
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 99px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            transition: var(--transition-snappy);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+
+        .btn-live:hover {
+            background: #000000;
+            transform: scale(1.04);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+
+        /* OFFICIAL FOOTER (BATAS PALING BAWAH) */
+        .official-footer {
+            margin-top: 1.5rem;
+            padding-bottom: 0.5rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .official-footer::before {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            margin: 0 auto 0.75rem;
+        }
+
+        .official-text {
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            color: #64748B;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .official-text span {
+            color: #F1F5F9;
+            font-weight: 800;
+        }
+
+        /* MODAL AUTO RESET (3 DETIK) */
+        #modal-thanks {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        #modal-thanks.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: #FFFFFF;
+            border-radius: 28px;
+            padding: 3rem 2rem;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+
+        .icon-success {
+            width: 70px;
+            height: 70px;
+            background: #D1FAE5;
+            color: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin: 0 auto 1.5rem;
+            font-weight: 900;
+        }
+
+        .modal-content h2 {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .timer-box {
+            background: #F1F5F9;
+            border-radius: 14px;
+            padding: 0.85rem;
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .timer-box strong {
+            color: var(--accent-blue);
+            font-size: 1.15rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 900px) {
+            h1.title { max-width: 100%; }
+            .floating-pill { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PATTERN BACKGROUND BERGERAK & INTERAKTIF -->
+    <div id="bg-pattern"></div>
+
+    <!-- GLOWING GOLD SHAPES -->
+    <div class="glowing-shape shape-1"></div>
+    <div class="glowing-shape shape-2"></div>
+    <div class="glowing-shape shape-3"></div>
+
+    <!-- SCREEN BLOCKED (HANYA DITAMPILKAN PADA DEVICE NON-TPS) -->
+    <div id="tps-blocked-screen">
+        <div class="blocked-card">
+            <h1>⚠️ AKSES DITOLAK</h1>
+            <p style="color: #94A3B8; line-height: 1.6;">Halaman e-Voting ini dikunci khusus dan hanya dapat diakses melalui Laptop Resmi di Bilik TPS OSIS.</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP VOTING -->
+    <div id="main-app">
+        
+        <!-- HERO SECTION -->
+        <div class="hero">
+            <div class="badge-pill">E-VOTING OSIS 2026</div>
+            
+            <div class="hero-title-row">
+                <div class="floating-pill floating-pill-left">🔒 SECURE VOTE SYSTEM</div>
+                <h1 class="title">Pemilihan Ketua OSIS <span class="gradient-text">Angkatan 25</span></h1>
+                <div class="floating-pill floating-pill-right">⚡ REAL-TIME SYNC</div>
+            </div>
+
+            <div class="subtitle-school">SMKS Karya Guna Bhakti 1 Kota Bekasi</div>
+            <div class="subtitle-periode">Periode 2026/2027</div>
+        </div>
+
+        <!-- GRID 4 KANDIDAT -->
+        <div class="paslon-grid">
+            
+            <!-- PASLON 1 -->
+            <div class="paslon-card">
+                <div>
+                    <div class="paslon-img-wrapper">
+                        <span class="paslon-number">01</span>
+                        <img src="images/paslon1.jpeg" alt="M. Helmi Hadad">
+                    </div>
+                    <div class="paslon-info">
+                        <h2>Muhammad Helmi Hadad</h2>
+                        <p>Kelas XI TSM 2</p>
+                    </div>
+                </div>
+                <button class="btn-coblos" onclick="coblos('paslon1')">COBLOS PASLON 01</button>
+            </div>
+
+            <!-- PASLON 2 -->
+            <div class="paslon-card">
+                <div>
+                    <div class="paslon-img-wrapper">
+                        <span class="paslon-number">02</span>
+                        <img src="images/paslon2.jpeg" alt="Adito Nugroho">
+                    </div>
+                    <div class="paslon-info">
+                        <h2>Adito Nugroho</h2>
+                        <p>Kelas XI TEI 2</p>
+                    </div>
+                </div>
+                <button class="btn-coblos" onclick="coblos('paslon2')">COBLOS PASLON 02</button>
+            </div>
+
+            <!-- PASLON 3 -->
+            <div class="paslon-card">
+                <div>
+                    <div class="paslon-img-wrapper">
+                        <span class="paslon-number">03</span>
+                        <img src="images/paslon3.jpeg" alt="Dinda Ratri K.">
+                    </div>
+                    <div class="paslon-info">
+                        <h2>Dinda Ratri Kusuma</h2>
+                        <p>Kelas XI DKV 2</p>
+                    </div>
+                </div>
+                <button class="btn-coblos" onclick="coblos('paslon3')">COBLOS PASLON 03</button>
+            </div>
+
+            <!-- PASLON 4 -->
+            <div class="paslon-card">
+                <div>
+                    <div class="paslon-img-wrapper">
+                        <span class="paslon-number">04</span>
+                        <img src="images/paslon4.jpeg" alt="M. Azzam">
+                    </div>
+                    <div class="paslon-info">
+                        <h2>Muhammad Azzam</h2>
+                        <p>Kelas XI TKR 3</p>
+                    </div>
+                </div>
+                <button class="btn-coblos" onclick="coblos('paslon4')">COBLOS PASLON 04</button>
+            </div>
+
+        </div>
+
+        <!-- FOOTER LINK -->
+        <div class="live-footer">
+            <a href="live-result.html" class="btn-live">📺 Buka Layar Live Result ↗</a>
+        </div>
+
+        <!-- OFFICIAL FOOTER -->
+        <div class="official-footer">
+            <p class="official-text">Created By <span>OSIS 24</span></p>
+        </div>
+
+    </div>
+
+    <!-- MODAL AUTO RESET (3 DETIK) -->
+    <div id="modal-thanks">
+        <div class="modal-content">
+            <div class="icon-success">✓</div>
+            <h2>SUARA BERHASIL DIREKAM!</h2>
+            <p>Terima kasih telah memberikan hak pilih Anda. Silakan keluar dari bilik suara.</p>
+            
+            <div class="timer-box">
+                <span>Bilik otomatis siap dalam <strong id="countdown-timer">3</strong> detik...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================================
+        // 1. TEMPEL LINK APPS SCRIPT DI SINI!
+        // =====================================================================
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvbzEUMsA946ga3zCsIyv5g57OwL-cKSDhoqGXzzQMnz_Ad5mddbGmHyPg7rIMjLu5rg/exec";
+
+        // 2. OTORISASI LAPTOP TPS (Device Check)
+        const isAuthorized = localStorage.getItem("TPS_AUTHORIZED");
+        if (isAuthorized !== "TRUE") {
+            document.getElementById("tps-blocked-screen").style.display = "flex";
+            document.getElementById("main-app").style.display = "none";
+        }
+
+        // 3. FUNGSI COBLOS + AUTO RESET 3 DETIK (ANTI-BUG / ANTI-CACHE)
+        function coblos(paslonKey) {
+            // KUNCI PERBAIKAN: Penambahan &t=${new Date().getTime()} di akhir URL
+            fetch(`${SCRIPT_URL}?action=vote&paslon=${paslonKey}&t=${new Date().getTime()}`, { mode: 'no-cors' })
+                .catch(error => console.error('Error pengiriman suara:', error));
+
+            const modal = document.getElementById("modal-thanks");
+            const timerDisplay = document.getElementById("countdown-timer");
+            modal.classList.add("active");
+
+            let timeLeft = 3;
+            timerDisplay.innerText = timeLeft;
+
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    modal.classList.remove("active");
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, 1000);
+        }
+
+        // 4. EFEK PARALLAX BACKGROUND
+        document.addEventListener("mousemove", (e) => {
+            const bg = document.getElementById("bg-pattern");
+            if(bg) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 30; 
+                const y = (e.clientY / window.innerHeight - 0.5) * 30;
+                bg.style.transform = `translate(${x}px, ${y}px)`;
+            }
+        });
+    </script>
