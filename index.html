@@ -656,25 +656,43 @@
         </div>
     </div>
 
+    <!-- SDK FIREBASE BASE & DATABASE (COMPAT VERSION FOR EASY INTEGRATION) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
     <script>
         // =====================================================================
-        // 1. TEMPEL LINK APPS SCRIPT DI SINI!
+        // KONFIGURASI FIREBASE REALTIME DATABASE (DESERIALIZED FROM CONSOLE)
         // =====================================================================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvbzEUMsA946ga3zCsIyv5g57OwL-cKSDhoqGXzzQMnz_Ad5mddbGmHyPg7rIMjLu5rg/exec";
+        const firebaseConfig = {
+            apiKey: "AIzaSyDRL177woSVI9cw9jnX9zxwx26R_SHxzXU",
+            authDomain: "evoting-osis-kgb1-2026.firebaseapp.com",
+            databaseURL: "https://evoting-osis-kgb1-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "evoting-osis-kgb1-2026",
+            storageBucket: "evoting-osis-kgb1-2026.firebasestorage.app",
+            messagingSenderId: "65167221701",
+            appId: "1:65167221701:web:4e8e37843138baf948e1ac",
+            measurementId: "G-NYVE6G0BNY"
+        };
 
-        // 2. OTORISASI LAPTOP TPS (Device Check)
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // OTORISASI LAPTOP TPS (Device Check)
         const isAuthorized = localStorage.getItem("TPS_AUTHORIZED");
         if (isAuthorized !== "TRUE") {
             document.getElementById("tps-blocked-screen").style.display = "flex";
             document.getElementById("main-app").style.display = "none";
         }
 
-        // 3. FUNGSI COBLOS + AUTO RESET 3 DETIK (ANTI-BUG / ANTI-CACHE)
+        // FUNGSI COBLOS (INSTAN & ANTI-TABRAKAN ATOMIC INCREMENT)
         function coblos(paslonKey) {
-            // KUNCI PERBAIKAN: Penambahan &t=${new Date().getTime()} di akhir URL
-            fetch(`${SCRIPT_URL}?action=vote&paslon=${paslonKey}&t=${new Date().getTime()}`, { mode: 'no-cors' })
+            // Tambah +1 suara secara atomik di Firebase (Terproses dalam hitungan milidetik!)
+            db.ref('votes/' + paslonKey).set(firebase.database.ServerValue.increment(1))
                 .catch(error => console.error('Error pengiriman suara:', error));
 
+            // Tampilkan Modal Ucapan Terima Kasih
             const modal = document.getElementById("modal-thanks");
             const timerDisplay = document.getElementById("countdown-timer");
             modal.classList.add("active");
@@ -694,7 +712,7 @@
             }, 1000);
         }
 
-        // 4. EFEK PARALLAX BACKGROUND
+        // EFEK PARALLAX BACKGROUND
         document.addEventListener("mousemove", (e) => {
             const bg = document.getElementById("bg-pattern");
             if(bg) {
@@ -704,3 +722,5 @@
             }
         });
     </script>
+</body>
+</html>

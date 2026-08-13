@@ -42,7 +42,6 @@
 
         body {
             background-color: var(--bg-dark);
-            /* Base gradients ditambah dengan efek shape interaktif di HTML */
             background-image: 
                 radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 60%),
                 radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
@@ -72,7 +71,7 @@
             transition: transform 0.1s ease-out;
         }
 
-        /* RANDOM GLOWING GOLD SHAPES (BARU) */
+        /* RANDOM GLOWING GOLD SHAPES */
         .glowing-shape {
             position: fixed;
             border-radius: 50%;
@@ -402,7 +401,7 @@
             z-index: 2;
         }
 
-        /* OFFICIAL CENTERED FOOTER (TANPA TOMBOL PEMENANG) */
+        /* OFFICIAL CENTERED FOOTER */
         footer.official-live-footer {
             text-align: center;
             padding: 1rem 0;
@@ -565,45 +564,52 @@
 
     </div>
 
-    <!-- JAVASCRIPT REAL-TIME POLLING DARI GOOGLE APPS SCRIPT -->
+    <!-- FIREBASE COMPAT SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
     <script>
         // =====================================================================
-        // TEMPEL LINK APPS SCRIPT YANG SAMA DENGAN FILE INDEX.HTML DI SINI!
+        // KONFIGURASI FIREBASE RESMI (EVOTING-OSIS-KGB1-2026)
         // =====================================================================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvbzEUMsA946ga3zCsIyv5g57OwL-cKSDhoqGXzzQMnz_Ad5mddbGmHyPg7rIMjLu5rg/exec";
+        const firebaseConfig = {
+            apiKey: "AIzaSyDRL177woSVI9cw9jnX9zxwx26R_SHxzXU",
+            authDomain: "evoting-osis-kgb1-2026.firebaseapp.com",
+            databaseURL: "https://evoting-osis-kgb1-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "evoting-osis-kgb1-2026",
+            storageBucket: "evoting-osis-kgb1-2026.firebasestorage.app",
+            messagingSenderId: "65167221701",
+            appId: "1:65167221701:web:4e8e37843138baf948e1ac",
+            measurementId: "G-NYVE6G0BNY"
+        };
 
-        // FUNGSI MEMANGGIL DATA LIVE DARI GOOGLE SHEETS (ANTI-BUG / ANTI-CACHE)
-        function fetchLiveVotes() {
-            if (!SCRIPT_URL || SCRIPT_URL === "PASTE_LINK_APPS_SCRIPT_DISINI") {
-                console.warn("Harap masukkan SCRIPT_URL terlebih dahulu!");
-                return Promise.resolve();
-            }
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-            // KUNCI PERBAIKAN: Penambahan &t=${new Date().getTime()} di akhir URL
-            return fetch(`${SCRIPT_URL}?action=get&t=${new Date().getTime()}`)
-                .then(response => response.json())
-                .then(data => {
-                    const v1 = Number(data.paslon1) || 0;
-                    const v2 = Number(data.paslon2) || 0;
-                    const v3 = Number(data.paslon3) || 0;
-                    const v4 = Number(data.paslon4) || 0;
-                    
-                    const totalVotes = v1 + v2 + v3 + v4;
+        // LISTEN DATA REALTIME (WEBSOCKET - INSTAN TANPA POLLING/SETINTERVAL)
+        db.ref('votes').on('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            
+            const v1 = Number(data.paslon1) || 0;
+            const v2 = Number(data.paslon2) || 0;
+            const v3 = Number(data.paslon3) || 0;
+            const v4 = Number(data.paslon4) || 0;
+            
+            const totalVotes = v1 + v2 + v3 + v4;
 
-                    // Update Angka Total Suara Masuk
-                    document.getElementById('total-votes-display').innerText = totalVotes;
+            // Update Total Suara
+            document.getElementById('total-votes-display').innerText = totalVotes;
 
-                    // Update Tinggi Diagram & Persentase Masing-Masing Paslon
-                    updateBarUI('paslon1', v1, totalVotes);
-                    updateBarUI('paslon2', v2, totalVotes);
-                    updateBarUI('paslon3', v3, totalVotes);
-                    updateBarUI('paslon4', v4, totalVotes);
+            // Update Tinggi Diagram & Persentase Masing-Masing Paslon
+            updateBarUI('paslon1', v1, totalVotes);
+            updateBarUI('paslon2', v2, totalVotes);
+            updateBarUI('paslon3', v3, totalVotes);
+            updateBarUI('paslon4', v4, totalVotes);
 
-                    // Beri Mahkota & Efek Glow pada Paslon Suara Terbanyak
-                    highlightLeader({ paslon1: v1, paslon2: v2, paslon3: v3, paslon4: v4 });
-                })
-                .catch(err => console.error("Gagal memperbarui data live:", err));
-        }
+            // Beri Mahkota & Efek Glow pada Pemimpin Suara
+            highlightLeader({ paslon1: v1, paslon2: v2, paslon3: v3, paslon4: v4 });
+        });
 
         // FUNGSI MENGHITUNG DYNAMIC HEIGHT & PERSENTASE
         function updateBarUI(key, count, total) {
@@ -612,7 +618,7 @@
             document.getElementById(`count-${key}`).innerText = count;
             document.getElementById(`percent-${key}`).innerText = percent + '%';
             
-            // Animasi tinggi batang diagram secara halus
+            // Minimum 2% agar batang tidak hilang sepenuhnya saat 0
             const displayHeight = percent > 0 ? percent : 2;
             document.getElementById(`bar-fill-${key}`).style.height = displayHeight + '%';
         }
@@ -645,14 +651,6 @@
                 bg.style.transform = `translate(${x}px, ${y}px)`;
             }
         });
-
-        // SISTEM POLLING CEPAT (Langsung minta data baru 0.8 detik setelah data sebelumnya selesai dimuat)
-        function startLivePolling() {
-            fetchLiveVotes().then(() => {
-                setTimeout(startLivePolling, 800);
-            });
-        }
-
-        // Jalankan polling otomatis
-        startLivePolling();
     </script>
+</body>
+</html>
