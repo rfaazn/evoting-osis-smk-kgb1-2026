@@ -687,30 +687,43 @@
         }
 
         // FUNGSI COBLOS (INSTAN & ANTI-TABRAKAN ATOMIC INCREMENT)
-        function coblos(paslonKey) {
-            // Tambah +1 suara secara atomik di Firebase (Terproses dalam hitungan milidetik!)
-            db.ref('votes/' + paslonKey).set(firebase.database.ServerValue.increment(1))
-                .catch(error => console.error('Error pengiriman suara:', error));
+        // GANTI FUNGSI COBLOS DI INDEX.HTML DENGAN INI
+function coblos(paslonKey) {
+    // 1. Tampilkan indikator loading (opsional tapi disarankan) agar user tidak menutup tab terlalu cepat
+    console.log("Mengirim suara...");
 
-            // Tampilkan Modal Ucapan Terima Kasih
-            const modal = document.getElementById("modal-thanks");
-            const timerDisplay = document.getElementById("countdown-timer");
-            modal.classList.add("active");
-
-            let timeLeft = 3;
-            timerDisplay.innerText = timeLeft;
-
-            const countdown = setInterval(() => {
-                timeLeft--;
-                timerDisplay.innerText = timeLeft;
-
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    modal.classList.remove("active");
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            }, 1000);
+    // 2. Gunakan TRANSACTION untuk keamanan data absolut
+    db.ref('votes/' + paslonKey).transaction(function(currentVotes) {
+        // Jika data belum ada, anggap 0, lalu tambah 1
+        return (currentVotes || 0) + 1;
+    }, function(error, committed, snapshot) {
+        if (error) {
+            console.error("Gagal mengirim suara:", error);
+            alert("Gagal terhubung ke server, silakan klik lagi.");
+        } else if (committed) {
+            console.log("Suara berhasil masuk!");
         }
+    });
+
+    // 3. Modal Terima Kasih (tetap muncul, tapi datanya sudah dikirim di atas)
+    const modal = document.getElementById("modal-thanks");
+    const timerDisplay = document.getElementById("countdown-timer");
+    modal.classList.add("active");
+
+    let timeLeft = 3;
+    timerDisplay.innerText = timeLeft;
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        timerDisplay.innerText = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            modal.classList.remove("active");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, 1000);
+}
 
         // EFEK PARALLAX BACKGROUND
         document.addEventListener("mousemove", (e) => {
